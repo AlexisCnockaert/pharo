@@ -75,7 +75,7 @@ ASTVariableNode class >> thisProcessNode [
 { #category : 'accessing' }
 ASTVariableNode class >> undeclaredVariableFlag [
 
-	^ UndeclaredVariableFlag ifNil: [ nil ]
+	^ UndeclaredVariableFlag
 ]
 
 { #category : 'settings - accessing' }
@@ -102,7 +102,6 @@ ASTVariableNode >> changeFlag [
 
 	self class undeclaredVariableFlag
 		ifFalse: [ self class undeclaredVariableFlag: true ]
-		"ifTrue: [ self class undeclaredVariableFlag: false ]."
 
 ]
 
