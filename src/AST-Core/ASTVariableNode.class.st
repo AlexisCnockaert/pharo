@@ -18,6 +18,9 @@ Class {
 		'variable',
 		'start'
 	],
+	#classVars : [
+		'UndeclaredVariableFlag'
+	],
 	#category : 'AST-Core-Nodes',
 	#package : 'AST-Core',
 	#tag : 'Nodes'
@@ -69,6 +72,18 @@ ASTVariableNode class >> thisProcessNode [
 	^ self named: #thisProcess
 ]
 
+{ #category : 'accessing' }
+ASTVariableNode class >> undeclaredVariableFlag [
+
+	^ UndeclaredVariableFlag ifNil: [ nil ]
+]
+
+{ #category : 'settings - accessing' }
+ASTVariableNode class >> undeclaredVariableFlag: aBoolean [
+
+	UndeclaredVariableFlag := aBoolean
+]
+
 { #category : 'comparing' }
 ASTVariableNode >> = anObject [
 	self == anObject ifTrue: [^true].
@@ -80,6 +95,15 @@ ASTVariableNode >> = anObject [
 { #category : 'visiting' }
 ASTVariableNode >> acceptVisitor: aProgramNodeVisitor [
 	^ variable acceptVisitor: aProgramNodeVisitor node: self
+]
+
+{ #category : 'action' }
+ASTVariableNode >> changeFlag [
+
+	self class undeclaredVariableFlag
+		ifFalse: [ self class undeclaredVariableFlag: true ]
+		"ifTrue: [ self class undeclaredVariableFlag: false ]."
+
 ]
 
 { #category : 'matching' }
@@ -116,7 +140,8 @@ ASTVariableNode >> initialize [
 	super initialize.
 	variable := UnresolvedVariable instance.
 	name := ''.
-	start := 0
+	start := 0.
+	self class undeclaredVariableFlag: false
 ]
 
 { #category : 'testing' }

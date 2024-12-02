@@ -303,29 +303,30 @@ OpalCompiler >> checkNotice: aNotice [
 			signal.
 		^ true ].
 
-	self requestor ifNotNil: [
-		"A requestor is available. We are in quirks mode and are expected to do UI things."
-		"Reparation menu in quirks mode:
+	self requestor ifNotNil: [ "A requestor is available. We are in quirks mode and are expected to do UI things.""Reparation menu in quirks mode:
 		* require a requestor (because quirks mode, and also some reparations expect a requestor)
 		* require interactive mode (because GUI)
 		* require method definition becase some reparation assume it's a method body"
 		self isInteractive ifTrue: [
-			aNotice reparator ifNotNil: [ :reparator |
-				| res |
-				res := reparator
-					requestor: requestor;
-					openMenu.
-				res ifNil: [ ^ true "reparation unneded, let AST as is" ].
-				res ifFalse: [ ^ false "operation cancelled, fail" ].
-				self parse: requestor text. "some reparation was done, reparse"
-				^ nil ] ].
+			aNotice node class undeclaredVariableFlag
+				ifTrue: [ ^ true ]
+				ifFalse: [
+					aNotice reparator ifNotNil: [ :reparator |
+						| res |
+						res := reparator
+							       requestor: requestor;
+							       openMenu.
+						res ifNil: [ ^ true "reparation unneded, let AST as is" ].
+						res ifFalse: [ ^ false "operation cancelled, fail" ].
+						self parse: requestor text. "some reparation was done, reparse"
+						^ nil ] ] ].
 
 		"Quirks mode: otherwise, push the error message to the requestor"
 		requestor
 			notify: aNotice messageText , ' ->'
 			at: aNotice position
 			in: aNotice node source.
-		
+
 		"Quirks mode: Then leave"
 		^ false ].
 

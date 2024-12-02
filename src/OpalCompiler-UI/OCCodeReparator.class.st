@@ -133,7 +133,6 @@ OCCodeReparator >> openMenu [
 	* Return fail if the user cancel"
 
 	| alternatives labels actions lines caption choice name interval |
-
 	interval := node sourceInterval.
 	name := node name.
 	alternatives := self possibleVariablesFor: name.
@@ -147,38 +146,41 @@ OCCodeReparator >> openMenu [
 			labels add: 'Declare new instance variable'.
 			actions add: [ self declareInstVar: name ] ]
 		ifFalse: [
+			labels add: 'Leave all variables undeclared'.
+			actions add: [
+				node changeFlag.
+				^ nil ].
 			labels add: 'Leave variable undeclared'.
 			actions add: [ ^ nil ].
 			lines add: labels size.
 			labels add: 'Define new class'.
-			actions
-				add: [
-					[ self defineClass: name asSymbol ]
-						on: Abort
-						do: [ self openMenu ] ].
-			labels add: 'Declare new global'.
-			actions add: [ self declareGlobal ].
-			requestor isScripting ifFalse:
-				[labels add: 'Declare new class variable'.
-				actions add: [ self declareClassVar ]].
+			actions add: [
+				[ self defineClass: name asSymbol ]
+					on: Abort
+					do: [ self openMenu ] ].
+			requestor isScripting ifFalse: [
+				labels add: 'Declare new class variable'.
+				actions add: [ self declareClassVar ] ].
 			labels add: 'Define new trait'.
-			actions
-				add: [
-					[ self defineTrait: name asSymbol ]
-						on: Abort
-						do: [ self openMenu ] ] ].
+			actions add: [
+				[ self defineTrait: name asSymbol ]
+					on: Abort
+					do: [ self openMenu ] ] ].
 	lines add: labels size.
-	alternatives
-		do: [ :each |
-			labels add: each.
-			actions
-				add: [
-					self substituteVariable: each atInterval: interval ] ].
+	alternatives do: [ :each |
+		labels add: each.
+		actions add: [ self substituteVariable: each atInterval: interval ] ].
 	lines add: labels size.
 	labels add: 'Cancel'.
-	caption := 'Unknown variable: ' , name , ' please correct, or cancel:'.
-	choice := MorphicUIManager new chooseFrom: labels lines: lines title: caption.
+	caption := 'Unknown variable: ' , name
+	           , ' please correct, or cancel:'.
+
+	choice := MorphicUIManager new
+		          chooseFrom: labels
+		          lines: lines
+		          title: caption.
 	(actions at: choice ifAbsent: [ ^ false ]) value.
+
 	^ true
 ]
 
