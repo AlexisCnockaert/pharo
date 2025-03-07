@@ -50,6 +50,7 @@ RBAbstractCondition >> errorString [
 
 { #category : 'private' }
 RBAbstractCondition >> errorStringFor: aBoolean [
+
 	^self errorMacro expandMacrosWith: aBoolean
 ]
 

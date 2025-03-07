@@ -26,6 +26,12 @@ Class {
 }
 
 { #category : 'instance creation' }
+RBCondition class >> alreadyExistGlobal: aString in: aRBSmalltalk [
+
+	^ self new block: [ aRBSmalltalk includesGlobal: aString asSymbol ] errorString: 'A class or global variable with the name:',  aString , ' already exists'
+]
+
+{ #category : 'instance creation' }
 RBCondition class >> canUnderstand: aSelector in: aClass [
 
 	^self new
@@ -240,17 +246,6 @@ RBCondition class >> isClass: anObject [
 ]
 
 { #category : 'testing' }
-RBCondition class >> isClass: className alreadyExistIn: aModel [
-
-	^ self new 
-		  block: [
-			  | aClassOrTrait |
-			  aClassOrTrait := aModel classNamed: className.
-			  aClassOrTrait isNil ]
-		  errorString: 'Class ' , className , ' already exists'
-]
-
-{ #category : 'testing' }
 RBCondition class >> isClass: aRBClass definedIn: aRBNamespace [ 
 	^ self isClassNamed: aRBClass name definedIn: aRBNamespace 
 ]
@@ -269,7 +264,7 @@ RBCondition class >> isClassNamed: className definedIn: aModel [
 { #category : 'instance creation' }
 RBCondition class >> isGlobal: aString in: aRBSmalltalk [
 
-	^ self new block: [ aRBSmalltalk includesGlobal: aString asSymbol ] errorString: aString , ' is <1?:not >a class or global variable'
+	^ self new block: [ aRBSmalltalk includesGlobal: aString asSymbol ] errorString: aString , ' is <1?:>a class or global variable'
 ]
 
 { #category : 'instance creation' }
