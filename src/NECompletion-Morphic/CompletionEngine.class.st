@@ -427,36 +427,43 @@ CompletionEngine >> showDetail [
 
 { #category : 'keyboard' }
 CompletionEngine >> smartBackspace [
-	| opposite currentText currentEditor smartCharacter |
 
+	| opposite currentText currentEditor smartCharacter index comment |
 	currentEditor := editor.
-	currentEditor hasSelection
-		ifTrue: [ ^ false ].
-
+	currentEditor hasSelection ifTrue: [ ^ false ].
 	currentText := currentEditor text.
-	smartCharacter := currentText at: currentEditor startIndex - 1 ifAbsent: [ ^ false ].	"take the opposite"
 
-	opposite := self smartCharacterOppositeOf: smartCharacter ifAbsent: [ ^ false ].	"test if the next char is opposite"
+	smartCharacter := currentText
+		                  at: currentEditor startIndex - 1
+		                  ifAbsent: [ ^ false ]. "take the opposite"
+	opposite := self
+		            smartCharacterOppositeOf: smartCharacter
+		            ifAbsent: [ ^ false ].
+	comment := (OCScanner on: (currentText
+			             copyFrom: editor lineIntervalAtCursorPosition first
+			             to: editor lineIntervalAtCursorPosition last)
+			            readStream) getComments.
+	comment ifNotNil: [ ^ false ].
+	index := currentEditor stopIndex.
 
-	opposite = (currentText at: currentEditor stopIndex ifAbsent: [ ^ false ])
-		ifFalse: [ ^ false ].	"test if there is an extra opposite to remove"
+	[
+	index <= currentText size and: [ (currentText at: index) isSeparator ] ]
+		whileTrue: [ index := index + 1 ].
 
+	(index <= currentText size and: [ (currentText at: index) = opposite ])
+		ifFalse: [ ^ false ].
 	(self
-		smartNeedExtraRemoveIn: currentText
-		for: smartCharacter
-		opposite: opposite
-		at: currentEditor startIndex)
-			ifFalse: [ ^ false ].
+		 smartNeedExtraRemoveIn: currentText
+		 for: smartCharacter
+		 opposite: opposite
+		 at: currentEditor startIndex) ifFalse: [ ^ false ].
 
 	currentEditor closeTypeIn.
-
 	currentEditor
 		selectInvisiblyFrom: currentEditor startIndex - 1
-		to: currentEditor stopIndex.
+		to: index.
 	currentEditor replaceSelectionWith: currentEditor nullText.
-
 	self invalidateEditorMorph.
-
 	^ true
 ]
 
