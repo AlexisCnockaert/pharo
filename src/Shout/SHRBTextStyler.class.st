@@ -1,5 +1,5 @@
 "
-I'm the one who visits node to coloring the code
+I adapt the Shout text styler to work with `Text`
 "
 Class {
 	#name : 'SHRBTextStyler',
