@@ -54,12 +54,15 @@ EpLostChangesDetector class >> startUp: isImageStarting [
 	| detector |
 	(isImageStarting and: [
 			 self isEnabled and: [ "Detector can be disabled via system settings"
-				 EpMonitor hasCurrent and: [ "Nothing to recover if wasn't recording" EpMonitor current isEnabled and: [ Smalltalk isInteractive ] ] ] ]) ifFalse: [ ^ self ]. "Can't browse if UI disabled"
+				 EpMonitor hasCurrent and: [ "Nothing to recover if wasn't recording"
+					 EpMonitor current isEnabled and: [ Smalltalk isInteractive ] ] ] ]) ifFalse: [ ^ self ]. "Can't browse if UI disabled"
 
 	detector := self new.
 
 	SessionManager default addDeferredStartupAction: [
-			(detector hasLostChanges and: [ self confirm: 'It seems your last Pharo session exited without saving some code. Do you want to recover it?' ]) ifTrue: [
+			(detector hasLostChanges and: [
+				 StPharoApplication current confirm:
+					 'It seems your last Pharo session exited without saving some code. Do you want to recover it?' ]) ifTrue: [
 				detector openBrowserIfLostChanges ] ]
 ]
 
